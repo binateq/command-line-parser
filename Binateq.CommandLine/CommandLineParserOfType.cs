@@ -10,8 +10,8 @@
         private readonly ICollection<PropertyInfo> _required;
         private readonly ICollection<PropertyInfo> _optional;
 
-        public CommandLineParserOfType()
-            : base(typeof (TCommand))
+        public CommandLineParserOfType(CommandPattern pattern)
+            : base(typeof (TCommand), pattern)
         {
             _required = new List<PropertyInfo>();
             _optional = new List<PropertyInfo>();
@@ -33,19 +33,17 @@
             return this;
         }
 
-        protected internal override bool TryApply<TCommandInterface>(string[] args, CommandLineParseOptions options, out TCommandInterface result)
+        protected internal override bool TryApply<TCommandInterface>(string[] args, out TCommandInterface result)
         {
             result = default(TCommandInterface);
 
             if (args.IsNullOrEmpty())
                 return false;
 
-            var normalizedCommandName = GetNormalizedCommandName(options.NormalizeCommandName);
-
-            if (!string.Equals(args[0], normalizedCommandName, options.StringComparison))
+            if (!string.Equals(args[0], NormalizedCommandName, StringComparison.Ordinal))
                 return false;
 
-            result = CreateCommand<TCommandInterface>(options.Resolve);
+            result = CreateCommand<TCommandInterface>();
             return true;
         }
     }

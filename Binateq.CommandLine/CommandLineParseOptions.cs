@@ -13,33 +13,24 @@
         public Func<Type, object> Resolve { get; }
 
         /// <summary>
-        /// Gets method to normalize command names.
+        /// Gets method to normalize command and parameters names.
         /// </summary>
-        public Func<string, string> NormalizeCommandName { get; }
-
-        /// <summary>
-        /// Gets string comparison.
-        /// </summary>
-        public StringComparison StringComparison { get; }
+        public Func<string, string> NormalizeName { get; }
 
         /// <summary>
         /// Initializes new instance of <see cref="CommandLineParseOptions"/> with specified parameters.
         /// </summary>
         /// <param name="resolve">Resolve method.</param>
-        /// <param name="normalizeCommandName">Normalize command name method.</param>
-        /// <param name="stringComparison">String comparison.</param>
+        /// <param name="normalizeName">Normalize command name method.</param>
         public CommandLineParseOptions(Func<Type, object> resolve = null,
-                                       Func<string, string> normalizeCommandName = null,
-                                       StringComparison stringComparison = StringComparison.OrdinalIgnoreCase)
+                                       Func<string, string> normalizeName = null)
         {
             Resolve = resolve ?? Activator.CreateInstance;
 
-            NormalizeCommandName = normalizeCommandName ?? Helper.RemoveSuffix("Command")
-                                                                 .Composite(Helper.SplitCamelCase)
-                                                                 .Composite(Helper.ToLower)
-                                                                 .Composite(Helper.JoinKebabCase);
-
-            StringComparison = stringComparison;
+            NormalizeName = normalizeName ?? Helper.RemoveSuffix("Command")
+                                                   .Composite(Helper.SplitCamelCase)
+                                                   .Composite(Helper.ToLower)
+                                                   .Composite(Helper.JoinKebabCase);
         }
     }
 }

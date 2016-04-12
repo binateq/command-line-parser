@@ -11,15 +11,15 @@
     /// <typeparam name="TCommand">Command type</typeparam>
     public class CommandLineParserDefault<TCommand> : TypedCommandParser
     {
-        private readonly IDictionary<PropertyInfo, object> _propertyValues;
+        private readonly IDictionary<PropertyInfo, object> _properties;
 
         /// <summary>
         /// Initializes new instance of <see cref="CommandLineParserDefault{TCommand}"/> type.
         /// </summary>
-        public CommandLineParserDefault()
-            : base(typeof (TCommand))
+        public CommandLineParserDefault(CommandPattern pattern)
+            : base(typeof (TCommand), pattern)
         {
-            _propertyValues = new Dictionary<PropertyInfo, object>();
+            _properties = new Dictionary<PropertyInfo, object>();
         }
 
         /// <summary>
@@ -32,16 +32,16 @@
         public virtual CommandLineParserDefault<TCommand> WithProperty<TProperty>(Expression<Func<TCommand, TProperty>> selector, TProperty value)
         {
             var propertyInfo = selector.ToPropertyInfo();
-            _propertyValues.Add(propertyInfo, value);
+            _properties.Add(propertyInfo, value);
 
             return this;
         }
 
         #region CommandLineParser implementation
 
-        protected internal override bool TryApply<TCommandInterface>(string[] args, CommandLineParseOptions options, out TCommandInterface result)
+        protected internal override bool TryApply<TCommandInterface>(string[] args, out TCommandInterface result)
         {
-            result = CreateCommand<TCommandInterface>(options.Resolve);
+            result = CreateCommand<TCommandInterface>();
 
             return true;
         }
@@ -50,10 +50,10 @@
 
         #region TypedCommandParser implementation
 
-        protected internal override TCommandInterface CreateCommand<TCommandInterface>(Func<Type, object> resolve)
+        protected internal override TCommandInterface CreateCommand<TCommandInterface>()
         {
-            var result = base.CreateCommand<TCommandInterface>(resolve);
-            _propertyValues.Set(result);
+            var result = base.CreateCommand<TCommandInterface>();
+            _properties.Set(result);
 
             return result;
         }

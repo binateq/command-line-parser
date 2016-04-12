@@ -31,12 +31,11 @@
         /// Applies left parser, and, if it fails, applies second parser to the specified command line arguments.
         /// </summary>
         /// <param name="args">Command line arguments.</param>
-        /// <param name="options">Options.</param>
         /// <param name="result">Instance of <typeparamref name="TCommandInterface"/> type, if one of two parsers was applied; otherwise <c>null</c>.</param>
         /// <returns><c>true</c>, if one of two parsers was applied; otherwise, <c>false</c>.</returns>
-        protected internal override bool TryApply<TCommandInterface>(string[] args, CommandLineParseOptions options, out TCommandInterface result)
+        protected internal override bool TryApply<TCommandInterface>(string[] args, out TCommandInterface result)
         {
-            return _left.TryApply(args, options, out result) || _right.TryApply(args, options, out result);
+            return _left.TryApply(args, out result) || _right.TryApply(args, out result);
         }
     }
 }
