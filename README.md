@@ -18,7 +18,8 @@ The `Message` is the required parameter for `-m` and value for `--message`.
 
 ## Parser
 
-This parser can parsing commands and possible named and ordered parameters in form `--name=value`, `-name=value`, or `/name:value`.
+This parser can parsing commands and possible named and ordered parameters in form `--name=value`,
+`-name=value`, or `/name:value`.
 
 ## `Command` design pattern
 
@@ -40,7 +41,7 @@ public interface ICommand
 }
 ```
 
-Then you make specific classes, one for each commands, that implement the interface or extend the abstract class.
+Then you make specific classes, one for each command, that implement the interface or extend the abstract class.
 
 ```c#
 public class HelpCommand : ICommand
@@ -146,15 +147,15 @@ var commandLinePattern = CommandPattern.OfType<Start>()
 With empty command line the `Help` command will be created when pattern applying. Default
 pattern should be last and it should be single.
 
-You can set default command's properties with the `WithPropertyValue` method:
+You can set default command's properties with the `WithProperty` method:
 
 ```c#
 var commandLinePattern = CommandPattern.OfType<Start>()
                        | CommandPattern.OfType<Stop>()
                        | CommandPattern.OfType<Help>()
                        | CommandPattern.Default<Help>()
-                                       .WithPropertyValue(help => help.Command, "help")
-                                       .WithPropertyValue(help => help.Verbose, true);
+                                       .WithProperty(help => help.Command, "help")
+                                       .WithProperty(help => help.Verbose, true);
 ```
 
 Without command line arguments the pattern will create the `Help` object with `Command` property set to `"help"`,
