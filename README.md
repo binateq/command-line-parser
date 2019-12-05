@@ -2,4 +2,4 @@
 
 ## Translations
 
-1. [README.RU.md](Русский)
+1. [Русский](README.RU.md)

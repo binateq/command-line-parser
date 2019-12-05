@@ -2,7 +2,7 @@
 
 ## Переводы
 
-1. [README.md](English)
+1. [English](README.md)
 
 ## Быстрый старт
 
