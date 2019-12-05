@@ -2,6 +2,21 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Authors>Mark Shevchenko</Authors>
+    <Company>Binateq</Company>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>Implements classes to command line parsing.</Description>
+    <Copyright>Copyright (c) 2015-2019 Binateq</Copyright>
+    <PackageProjectUrl>https://github.com/binateq/command-line-parser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/binateq/command-line-parser.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
