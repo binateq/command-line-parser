@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Binateq.CommandLine.Demo.Copy": {
+      "commandName": "Project",
+      "commandLineArgs": "rfc1518.txt rfc1918.txt rfc3339.txt rfcs.txt -f"
+    }
+  }
+}
