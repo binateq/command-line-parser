@@ -2,4 +2,4 @@
 
 ## Translations
 
-1. [Русский](README.RU.md)
+1. [Р СѓСЃСЃРєРёР№](README.RU.md)
