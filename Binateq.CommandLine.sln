@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Binateq.CommandLine", "Bina
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Binateq.CommandLine.Demo.Copy", "Binateq.CommandLine.Demo.Copy\Binateq.CommandLine.Demo.Copy.csproj", "{B10EF96B-F60E-4CB9-8082-CB54FBEBE829}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binateq.CommandLine.Tests", "Binateq.CommandLine.Tests\Binateq.CommandLine.Tests.csproj", "{1358C4E2-9423-46C8-99C5-4E042B492110}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Binateq.CommandLine.Tests", "Binateq.CommandLine.Tests\Binateq.CommandLine.Tests.csproj", "{1358C4E2-9423-46C8-99C5-4E042B492110}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Binateq.CommandLine.Demo.Zip", "Binateq.CommandLine.Demo.Zip\Binateq.CommandLine.Demo.Zip.csproj", "{E0E0C5BA-A9E4-497E-A908-725190F6AEE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1358C4E2-9423-46C8-99C5-4E042B492110}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1358C4E2-9423-46C8-99C5-4E042B492110}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1358C4E2-9423-46C8-99C5-4E042B492110}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0E0C5BA-A9E4-497E-A908-725190F6AEE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0E0C5BA-A9E4-497E-A908-725190F6AEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0E0C5BA-A9E4-497E-A908-725190F6AEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0E0C5BA-A9E4-497E-A908-725190F6AEE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -48,15 +48,15 @@
             if (File.Exists(destinationFile) && !IsForce)
                 throw new InvalidOperationException("Destination file already exists. Specify --force parameter to overwrite.");
 
-            using (var outputStream = new FileStream(destinationFile, FileMode.Create, FileAccess.Write))
+            using (var output = new FileStream(destinationFile, FileMode.Create, FileAccess.Write))
             {
                 foreach (var sourceFile in sourceFiles)
                 {
-                    using (var inputStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
+                    using (var input = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
                     {
                         int read;
-                        while ((read = inputStream.Read(buffer, 0, buffer.Length)) > 0)
-                            outputStream.Write(buffer, 0, read);
+                        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                            output.Write(buffer, 0, read);
                     }
 
                     Console.WriteLine(sourceFile);

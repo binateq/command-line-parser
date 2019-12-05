@@ -28,8 +28,8 @@
         [Fact]
         public void GetPublicInstanceSettableProperties_WhenCalled_ReturnsListOfValidProperties()
         {
-            var actual = Parser<Mock>.GetPublicInstanceSettableProperties()
-                                     .Select(x => x.Name);
+            var actual = Parser<Mock, Mock>.GetPublicInstanceSettableProperties()
+                                           .Select(x => x.Name);
 
             Assert.Equal(new[] { "Public" }, actual);
         }
@@ -37,7 +37,7 @@
         [Fact]
         public void GetPropertyInfo_WithSelector_ReturnsPropertyInfoWithValidName()
         {
-            var info = Parser<Mock>.GetPropertyInfo(x => x.Public);
+            var info = Parser<Mock, Mock>.GetPropertyInfo(x => x.Public);
 
             Assert.Equal("Public", info.Name);
         }
@@ -47,7 +47,7 @@
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                var info = Parser<Mock>.GetPropertyInfo(x => x.Public + x.ReadOnly);
+                var info = Parser<Mock, Mock>.GetPropertyInfo(x => x.Public + x.ReadOnly);
             });
         }
     }

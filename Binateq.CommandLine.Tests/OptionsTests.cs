@@ -1,4 +1,4 @@
-namespace Binatec.CommandLine.Tests
+namespace Binateq.CommandLine.Tests
 {
     using Binateq.CommandLine;
     using Xunit;

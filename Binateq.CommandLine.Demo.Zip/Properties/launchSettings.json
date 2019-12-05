@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Binateq.CommandLine.Demo.Zip": {
+      "commandName": "Project",
+      "commandLineArgs": "a rfcs.zip rfc1518.txt rfc1918.txt rfc3339.txt"
+    }
+  }
+}

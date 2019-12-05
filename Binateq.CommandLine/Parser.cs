@@ -7,20 +7,101 @@
     using System.Reflection;
 
     /// <summary>
-    /// Describes the methods to build a command line parser.
+    /// Implements the methods to build a command line parser.
     /// </summary>
     public abstract class Parser
     {
-        public static Parser<TCommand> Simple<TCommand>()
+        public static Parser<TCommand, TCommand> Simple<TCommand>()
         {
             return new SimpleParser<TCommand>();
+        }
+
+        public static Parser<TCommandBase, TCommand> Command<TCommandBase, TCommand>(string name)
+            where TCommand : TCommandBase
+        {
+            return new CommandParser<TCommandBase, TCommand>(name);
+        }
+
+        public static Parser<TCommandBase, TCommand> Command<TCommandBase, TCommand>(string name, string altername)
+            where TCommand : TCommandBase
+        {
+            return new CommandParser<TCommandBase, TCommand>(name, altername);
+        }
+
+        public static Parser<TCommandBase, TCommand> Default<TCommandBase, TCommand>(string name)
+            where TCommand : TCommandBase
+        {
+            return new DefaultParser<TCommandBase, TCommand>(name);
+        }
+
+        public static Parser<TCommandBase, TCommand> Default<TCommandBase, TCommand>(string name, string altername)
+            where TCommand : TCommandBase
+        {
+            return new DefaultParser<TCommandBase, TCommand>(name, altername);
+        }
+    }
+
+    public abstract class Parser<TCommandBase>
+    {
+        /// <summary>
+        /// Parses arguments of command line using specified options.
+        /// </summary>
+        /// <param name="args">Arguments of command line.</param>
+        /// <param name="settings">Settings.</param>
+        /// <returns>The instance of command object.</returns>
+        public TCommandBase Parse(string[] args, Settings settings)
+        {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings));
+
+            var scanner = new Scanner(args);
+
+            if (TryParse(scanner, settings, out TCommandBase command))
+                return command;
+
+            throw new FormatException("Unrecognized command line.");
+        }
+
+        /// <summary>
+        /// Parses arguments of command line.
+        /// </summary>
+        /// <param name="args">Arguments of command line.</param>
+        /// <returns>The instance of command object.</returns>
+        public TCommandBase Parse(string[] args)
+        {
+            var defaultSettings = new Settings();
+
+            return Parse(args, defaultSettings);
+        }
+
+        /// <summary>
+        /// Parses arguments of command line using specified settings.
+        /// </summary>
+        /// <param name="scanner">Iterator of arguments.</param>
+        /// <param name="settings">Settings.</param>
+        /// <param name="command">Created command object which initialized properties.</param>
+        /// <returns><c>true</c> if arguments was parsed successfully; otherwise, <c>false</c>.</returns>
+        protected internal abstract bool TryParse(Scanner scanner, Settings settings, out TCommandBase command);
+
+        /// <summary>
+        /// Makes or-combinator of two parsers.
+        /// </summary>
+        /// <param name="p1">First parser.</param>
+        /// <param name="p2">Secon parser.</param>
+        /// <returns>Combined parser.</returns>
+        public static Parser<TCommandBase> operator |(Parser<TCommandBase> p1, Parser<TCommandBase> p2)
+        {
+            return new OrParser<TCommandBase>(p1, p2);
         }
     }
 
     /// <summary>
-    /// Describes abstarct command parser.
+    /// Implements abstract command line parser.
     /// </summary>
-    public abstract class Parser<TCommand>
+    public abstract class Parser<TCommandBase, TCommand> : Parser<TCommandBase>
     {
         protected internal const string NonamedIndexer = "@";
 
@@ -35,44 +116,10 @@
 
         internal static IEnumerable<PropertyInfo> GetPublicInstanceSettableProperties()
         {
-            return from property in typeof(TCommand).GetProperties()
+            return from property in typeof(TCommandBase).GetProperties()
                    let method = property.GetSetMethod(nonPublic: true)
                    where property.CanWrite && method.IsPublic && !method.IsStatic
                    select property;
-        }
-
-        /// <summary>
-        /// Parses arguments of command line using specified options.
-        /// </summary>
-        /// <param name="args">Arguments of command line.</param>
-        /// <param name="settings">Settings.</param>
-        /// <returns>The instance of command object.</returns>
-        public TCommand Parse(string[] args, Settings settings)
-        {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
-
-            if (settings == null)
-                throw new ArgumentNullException(nameof(settings));
-
-            var scanner = new Scanner(args);
-
-            if (TryParse(scanner, settings, out TCommand command))
-                return command;
-
-            throw new FormatException("Unrecognized command line.");
-        }
-
-        /// <summary>
-        /// Parses arguments of command line.
-        /// </summary>
-        /// <param name="args">Arguments of command line.</param>
-        /// <returns>The instance of command object.</returns>
-        public TCommand Parse(string[] args)
-        {
-            var defaultSettings = new Settings();
-
-            return Parse(args, defaultSettings);
         }
 
         /// <summary>
@@ -81,7 +128,7 @@
         /// <param name="selector">A lambda expression representing the property to be linked (<code>x => x.IsForce</code>).</param>
         /// <param name="name">A name of option including prefix (<code>-f</code>).</param>
         /// <returns>A parser with linked property and option.</returns>
-        public Parser<TCommand> Named(Expression<Func<TCommand, object>> selector, string name)
+        public Parser<TCommandBase, TCommand> Named(Expression<Func<TCommand, object>> selector, string name)
         {
             var info = GetPropertyInfo(selector);
 
@@ -95,14 +142,14 @@
         /// </summary>
         /// <param name="selector">A lambda expression representing the property to be linked (<code>x => x.IsForce</code>).</param>
         /// <param name="name">A name of option including prefix (<code>-f</code>).</param>
-        /// <param name="name">An alternate name of option including prefix (<code>--force</code>).</param>
+        /// <param name="altername">An alternate name of option including prefix (<code>--force</code>).</param>
         /// <returns>A parser with linked property and option.</returns>
-        public Parser<TCommand> Named(Expression<Func<TCommand, object>> selector, string name, string alternateName)
+        public Parser<TCommandBase, TCommand> Named(Expression<Func<TCommand, object>> selector, string name, string altername)
         {
             var info = GetPropertyInfo(selector);
 
             _properties[name] = info;
-            _properties[alternateName] = info;
+            _properties[altername] = info;
 
             return this;
         }
@@ -144,7 +191,7 @@
         /// </summary>
         /// <param name="selector">A lambda expression representing the property to be linked (<code>x => x.Files</code>).</param>
         /// <returns>A parser with linked property.</returns>
-        public Parser<TCommand> Nonamed(Expression<Func<TCommand, IEnumerable<string>>> selector)
+        public Parser<TCommandBase, TCommand> Nonamed(Expression<Func<TCommand, IEnumerable<string>>> selector)
         {
             var info = GetPropertyInfo(selector);
 
@@ -153,13 +200,51 @@
             return this;
         }
 
-        /// <summary>
-        /// Parses arguments of command line using specified settings.
-        /// </summary>
-        /// <param name="scanner">Iterator of arguments.</param>
-        /// <param name="settings">Settings.</param>
-        /// <param name="command">Created command object which initialized properties.</param>
-        /// <returns><c>true</c> if arguments was parsed successfully; otherwise, <c>false</c>.</returns>
-        protected internal abstract bool TryParse(Scanner scanner, Settings settings, out TCommand command);
+        protected virtual void UpdateNamedProperties(object command, IReadOnlyDictionary<string, string> named)
+        {
+            foreach (var nameValue in named)
+                UpdateNamedProperty(command, nameValue.Key, nameValue.Value);
+        }
+
+        protected virtual void UpdateNamedProperty(object command, string name, string stringValue)
+        {
+            if (!Properties.ContainsKey(name))
+                return;
+
+            var type = Properties[name].PropertyType;
+            var value = ConvertStringToType(stringValue, type);
+
+            Properties[name].SetValue(command, value);
+        }
+
+        private static readonly string[] TrueValues = new[] { null, "", "1", "yes", "true" };
+        private static readonly string[] FalseValues = new[] { "0", "no", "false" };
+
+        internal static object ConvertStringToType(string value, Type type)
+        {
+            if (type == typeof(bool))
+            {
+                if (TrueValues.Any(x => string.Equals(value, x, StringComparison.InvariantCultureIgnoreCase)))
+                    return true;
+
+                if (FalseValues.Any(x => string.Equals(value, x, StringComparison.InvariantCultureIgnoreCase)))
+                    return false;
+
+                throw new InvalidOperationException("Invalid boolean value.");
+            }
+
+            if (type == typeof(string))
+                return value;
+
+            return Convert.ChangeType(value, type);
+        }
+
+        protected virtual void UpdateNonamedIndexer(object command, IEnumerable<string> unnamed)
+        {
+            if (Properties[NonamedIndexer] == null)
+                return;
+
+            Properties[NonamedIndexer].SetValue(command, unnamed);
+        }
     }
 }
