@@ -116,7 +116,7 @@
 
         internal static IEnumerable<PropertyInfo> GetPublicInstanceSettableProperties()
         {
-            return from property in typeof(TCommandBase).GetProperties()
+            return from property in typeof(TCommand).GetProperties()
                    let method = property.GetSetMethod(nonPublic: true)
                    where property.CanWrite && method.IsPublic && !method.IsStatic
                    select property;
@@ -241,10 +241,8 @@
 
         protected virtual void UpdateNonamedIndexer(object command, IEnumerable<string> unnamed)
         {
-            if (Properties[NonamedIndexer] == null)
-                return;
-
-            Properties[NonamedIndexer].SetValue(command, unnamed);
+            if (Properties.ContainsKey(NonamedIndexer))
+                Properties[NonamedIndexer].SetValue(command, unnamed);
         }
     }
 }

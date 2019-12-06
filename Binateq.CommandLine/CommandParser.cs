@@ -42,6 +42,9 @@
             if (string.Equals(name, _name, StringComparison.InvariantCultureIgnoreCase))
                 return true;
 
+            if (_altername == null)
+                return false;
+
             return string.Equals(name, _altername, StringComparison.InvariantCultureIgnoreCase);
         }
     }

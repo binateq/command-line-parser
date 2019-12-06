@@ -10,10 +10,10 @@
     <PackageProjectUrl>https://github.com/binateq/command-line-parser</PackageProjectUrl>
     <RepositoryUrl>https://github.com/binateq/command-line-parser.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>Made complex argument parsing.</PackageReleaseNotes>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+    <Version>1.0.3</Version>
+    <PackageReleaseNotes>Debugged.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
