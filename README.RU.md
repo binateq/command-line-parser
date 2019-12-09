@@ -9,6 +9,7 @@
 * [Быстрый старт](#быстрый-старт)
 * [Простой анализатор](#простой-анализатор)
 * [Командная строка с командами](#командная-строка-с-командами)
+* [Неименованные параметры](#неименованные-параметры)
 
 ## Быстрый старт
 
@@ -186,7 +187,7 @@ static void Main(string[] args)
 Чтобы упаковать файлы с помощью **arj**, мы пишем
 
 ```
-arj a -d2 archive file1 file2 file3
+arj a -d2 archive file₁ file₂ ... fileₙ
 ```
 
 Чтобы зафиксировать изменения в git
@@ -203,7 +204,8 @@ git commit -m "Comment"
 Для каждой команды создадим класс. Назовём классы `AddCommand`, `ExtractCommand`,
 `ListCommand` и `HelpCommand`.
 
-В паттерне *Command* реализации команд разделяют общий интерфейс. Опишем его.
+В паттерне *Command* команды-реализации разделяют общий интерфейс. Библиотека может работать
+с нашим интерфейсом или абстрактным классом.
 
 ```
 interface ICommand
@@ -212,3 +214,138 @@ interface ICommand
 }
 ```
 
+Создадим (пока) пустые классы `AddCommand`, `ExtractCommand`, `ListCommand` и `HelpCommand`.
+
+```
+class AddCommand : ICommand
+{
+    public void Run() {  }
+}
+```
+
+Наконец, в главном модуле программы **Program.cs** опишем паттерн командной строки.
+
+```
+var parser = Parser.Command<ICommand, AddCommand>("add", "a")
+           | Parser.Command<ICommand, ExtractCommand>("extract", "x")
+           | Parser.Command<ICommand, ListCommand>("list", "l")
+           | Parser.Default<ICommand, HelpCommand>("help", "h")
+           ;
+
+var command = parser.Parse(args);
+command.Run();
+```
+
+Если первый параметр комадной строки будет **add** или **a**, анализатор создаст класс
+`AddCommand`.
+
+Метод `parser.Parse(args)` вернёт объект, реализующий `ICommand`, или выбросит исключение.
+
+## Именованные параметры
+
+Команда **add** позволяет нам задавать уровень сжатия, как число 0, 1 или 2.
+
+```
+demozip add archive -level=2 file₁ file₂ ... fileₙ
+```
+
+Параметр `level` называется *именованным* параметром, поскольку имеет имя. Все изменяемые публичные
+свойства класса-команды становятся именнованными параметрами без дополнительных указаний и настроек.
+
+```
+class AddCommand : ICommand
+{
+    public int Level { get; set; } = 0;
+
+    public void Run() {  }
+}
+```
+
+Иногда мы хотим задать короткое имя для именованного параметра.
+
+```
+var parser = Parser.Command<ICommand, AddCommand>("add", "a")
+                   .Named(x => x.Level, "-l")
+             . . .
+```
+
+В некоторых программах у параметра бывает и полное, и сокращённое имя.
+
+```
+var parser = Parser.Command<ICommand, AddCommand>("add", "a")
+                   .Named(x => x.Level, "-l", "--level")
+             . . .
+```
+
+## Неименованные параметры
+
+Команда **add** принимает на вход несколько имён файлов, первый из которых это имя архива, а второй
+и последующие — имена файлов для архивации.
+
+```
+demozip add archive file₁ file₂ ... fileₙ
+```
+
+Библиотека, встретив параметр, который не начинается с символа *дефис* (-), считает его именем
+файла и добавляет в список неименованных параметров.
+
+Вы можете завести в классе свойство типа `IEnumerable<string>`, `IReadOnlyCollection<string>` или
+`IReadOnlyList<string>`, чтобы получить доступ к неименованным параметрам.
+
+```
+class AddCommand : ICommand
+{
+    public int Level { get; set; } = 0;
+
+    public IReadOnlyList<string> Files { get; set; }
+
+    public void Run() {  }
+}
+```
+
+```
+var parser = Parser.Command<ICommand, AddCommand>("add", "a")
+                   .Named(x => x.Level, "-l", "--level")
+                   .Nonamed(x => x.Files)
+             . . .
+```
+Реализация команды **add** выглядит так.
+
+```
+class AddCommand : ICommand
+{
+    public int Level { get; set; } = 0;
+
+    public uint Size { get; set; } = 1 << 16;
+
+    public IReadOnlyList<string> Files { get; set; }
+
+    public void Run()
+    {
+        if (Files.Count == 0)
+            throw new InvalidOperationException("Missing archive's name.");
+
+        if (Files.Count == 1)
+            throw new InvalidOperationException("Missing files to archive.");
+
+        var buffer = new byte[Size];
+
+        using (var archive = ZipFile.Open(Files[0], ZipArchiveMode.Create))
+        {
+            for (int i = 1; i < Files.Count; i++)
+            {
+                var entry = archive.CreateEntry(Files[i], (CompressionLevel)Level);
+                using (var output = entry.Open())
+                using (var input = File.OpenRead(Files[i]))
+                {
+                    int read;
+                    while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                        output.Write(buffer, 0, read);
+                }
+
+                Console.WriteLine(Files[i]);
+            }
+        }
+    }
+}
+```

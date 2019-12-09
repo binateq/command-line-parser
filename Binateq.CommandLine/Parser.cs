@@ -211,6 +211,9 @@
             if (!Properties.ContainsKey(name))
                 return;
 
+            if (stringValue == null)
+                return;
+
             var type = Properties[name].PropertyType;
             var value = ConvertStringToType(stringValue, type);
 
@@ -235,6 +238,9 @@
 
             if (type == typeof(string))
                 return value;
+
+            if (type == typeof(Guid))
+                return Guid.Parse(value);
 
             return Convert.ChangeType(value, type);
         }

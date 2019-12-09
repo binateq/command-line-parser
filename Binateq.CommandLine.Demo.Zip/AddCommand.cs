@@ -7,7 +7,7 @@
 
     class AddCommand : ICommand
     {
-        public int Level { get; set; }
+        public int Level { get; set; } = 0;
 
         public IReadOnlyList<string> Files { get; set; }
 
@@ -25,7 +25,7 @@
             {
                 for (int i = 1; i < Files.Count; i++)
                 {
-                    var entry = archive.CreateEntry(Files[i]);
+                    var entry = archive.CreateEntry(Files[i], (CompressionLevel)Level);
                     using (var output = entry.Open())
                     using (var input = File.OpenRead(Files[i]))
                     {
