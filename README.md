@@ -9,6 +9,7 @@
 * [Quick Start](#quick-start)
 * [Simple Parser](#simple-parser)
 * [Parser With Commands](#parser-with-commands)
+* [Named Parameters](#named-parameters)
 * [Nameless Parameters](#nameless-parameters)
 
 ## Quick Start
@@ -228,16 +229,15 @@ If the first parameter of command line will be **add** or **a**, then the parser
 
 The method `parser.Parse(args)` will return an object that implements `ICommand`, or raises an exception.
 
-## Именованные параметры
+## Named Parameters
 
-Команда **add** позволяет нам задавать уровень сжатия, как число 0, 1 или 2.
+The **add** command let us set level of packing, as a number 0, 1, or 2.
 
 ```
 demozip add archive -level=2 file₁ file₂ ... fileₙ
 ```
 
-Параметр `level` называется *именованным* параметром, поскольку имеет имя. Все изменяемые публичные
-свойства класса-команды становятся именнованными параметрами без дополнительных указаний и настроек.
+The `level` parameter called *named* parameter because has the name. By default, all mutable public properties of command class are named parameters.
 
 ```
 class AddCommand : ICommand
@@ -248,7 +248,7 @@ class AddCommand : ICommand
 }
 ```
 
-Иногда мы хотим задать короткое имя для именованного параметра.
+Sometimes we want to set short name for named parameter.
 
 ```
 var parser = Parser.Command<ICommand, AddCommand>("add", "a")
@@ -256,7 +256,7 @@ var parser = Parser.Command<ICommand, AddCommand>("add", "a")
              . . .
 ```
 
-В некоторых программах у параметра бывает и полное, и сокращённое имя.
+Sometimes parameter has both short and full name.
 
 ```
 var parser = Parser.Command<ICommand, AddCommand>("add", "a")
@@ -272,7 +272,7 @@ The command **add** can process a few file names. First of them is the archive's
 demozip add archive file₁ file₂ ... fileₙ
 ```
 
-All parameters that start with *hyphen* (-) are named. For example, the **--help** parameter has the name *help*. All other parameters are *nameless*. All of them store in a single property, that has the type `IEnumerable<string>`, `IReadOnlyCollection<string>`, or `IReadOnlyList<string>`.
+All parameters that start with *hyphen* (-) are named. All other parameters are *nameless*. All of them store in a single property, that has the type `IEnumerable<string>`, `IReadOnlyCollection<string>`, or `IReadOnlyList<string>`.
 
 ```
 class AddCommand : ICommand
